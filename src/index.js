@@ -51,7 +51,11 @@ console.log();
 app.get("/", async (req, res) => {
     if (req.query.uploaded && /[^a-z0-9]/.exec(req.query.uploaded))
         return res.render("error", { msg: "bad url" });
-    res.render("index", { uploaded: req.query.uploaded, baseURL });
+    res.render("index", {
+        uploaded: req.query.uploaded,
+        baseURL,
+        s: !!req.query.s,
+    });
 });
 
 app.use("/public", express.static(path.join(__dirname, "client")));
@@ -64,13 +68,16 @@ app.post("/upload", async (req, res) => {
     let foldername = "/data/" + fileid;
     let basedir = path.join(__dirname, "..");
     await fs.mkdir(path.join(basedir, foldername), { recursive: true });
-    for (let file of Array.isArray(req.files.upload)
+    let filearr = Array.isArray(req.files.upload)
         ? req.files.upload
-        : [req.files.upload]) {
+        : [req.files.upload];
+    for (let file of filearr) {
         let filename = path.join(foldername, file.name /*safe*/);
         file.mv(path.join(basedir, filename));
     }
-    return res.redirect("/?uploaded=" + fileid);
+    return res.redirect(
+        "/?uploaded=" + fileid + (filearr.length === 1 ? "" : "&s=s"),
+    );
 });
 
 // this is unnecessarily complicated

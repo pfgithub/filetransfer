@@ -17,6 +17,7 @@
 		<div class="content">
 			<% if(uploaded) { %>
 				<% let link = baseURL + "/download/" + uploaded; %>
+				Your file<%= s ? "s" : ""%> <%= s ? "have" : "has"%> been uploaded.
 				<h1>Code: <%= uploaded %></h1>
 				<p><a href="<%= link %>"><%= link %></a></p>
 				<img class="qr" width="150" height="150" src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=<%= encodeURIComponent(link) %>">
