@@ -31,10 +31,10 @@ resips = resips.filter(([name, addr]) => {
 });
 if (resips.length > 1) {
     console.log(
-        "Too many ip addresses. Launch with a listed env command to select correct address."
+        "Too many ip addresses. Launch with a listed env command to select correct address.",
     );
     console.log(
-        "Address will be used to show links and QR codes to download files."
+        "Address will be used to show links and QR codes to download files.",
     );
     console.log();
     for (let [name, addr] of resips) {
@@ -78,8 +78,8 @@ function randomName() {
                 .replace(/[0-9]/g, char =>
                     String.fromCodePoint(
                         char.codePointAt() +
-                            ("g".codePointAt() - "0".codePointAt())
-                    )
+                            ("g".codePointAt() - "0".codePointAt()),
+                    ),
                 );
             for (let i = 1; i < str.length - 3; i++) {
                 let strv = str.substring(0, i);
@@ -115,7 +115,7 @@ function downloadFile(mode, get) {
         if (files.length < 1) throw new Error("too few files");
         if (get || files[0] !== req.params.filename)
             return res.redirect(
-                "/" + mode + "/" + fileid + "/" + encodeURIComponent(files[0])
+                "/" + mode + "/" + fileid + "/" + encodeURIComponent(files[0]),
             );
         let filepath = path.join(foldername, files[0]);
         if (mode === "view") res.sendFile(filepath);
