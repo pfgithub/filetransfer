@@ -14,7 +14,7 @@
 			<img class="qr" width="150" height="150" src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=<%= encodeURIComponent(link) %>">
 		<% } %>
 		<form action="/upload" method="post" enctype="multipart/form-data">
-			<input type="file" name="upload">
+			<input id="upload" type="file" name="upload">
 			<button>Upload!</button>
 		</form>
 		<form action="/download" method="get" enctype="multipart/form-data">
