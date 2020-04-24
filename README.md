@@ -7,6 +7,9 @@ quickly transfer files within your local network
 ### homepage
 ![homepage](https://raw.githubusercontent.com/pfgithub/filetransfer/master/.github/home.png)
 
+### drop anywhere
+![dropanywhere](https://raw.githubusercontent.com/pfgithub/filetransfer/master/.github/dropanywhere.png)
+
 ### after uploading files
 ![uploaded](https://raw.githubusercontent.com/pfgithub/filetransfer/master/.github/uploaded.png)
 
