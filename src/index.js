@@ -62,10 +62,14 @@ app.post("/upload", async (req, res) => {
         return res.redirect("/error/upload-failed");
     let fileid = await randomName();
     let foldername = "/data/" + fileid;
-    let filename = path.join(foldername, req.files.upload.name /*safe*/);
     let basedir = path.join(__dirname, "..");
     await fs.mkdir(path.join(basedir, foldername), { recursive: true });
-    req.files.upload.mv(path.join(basedir, filename));
+    for (let file of Array.isArray(req.files.upload)
+        ? req.files.upload
+        : [req.files.upload]) {
+        let filename = path.join(foldername, file.name /*safe*/);
+        file.mv(path.join(basedir, filename));
+    }
     return res.redirect("/?uploaded=" + fileid);
 });
 
@@ -81,7 +85,7 @@ function randomName() {
                             ("g".codePointAt() - "0".codePointAt()),
                     ),
                 );
-            for (let i = 4; i < str.length - 3; i++) {
+            for (let i = 3; i < str.length; i++) {
                 let strv = str.substring(0, i);
                 try {
                     await fs.access(path.join(__dirname, "..", "data", strv));
@@ -109,15 +113,19 @@ function downloadFile(mode, get) {
             res.status(404);
             return res.render("error", { msg: "file not found" });
         }
-        if (files.length > 1) throw new Error("too many files");
-        if (files.length < 1) throw new Error("too few files");
-        if (get || files[0] !== req.params.filename)
-            return res.redirect(
-                "/" + mode + "/" + fileid + "/" + encodeURIComponent(files[0]),
-            );
-        let filepath = path.join(foldername, files[0]);
-        if (mode === "view") res.sendFile(filepath);
-        else res.download(filepath);
+        let ffiltered = files.filter(file => file === req.params.filename);
+        if (files.length === 1 || ffiltered.length === 1) {
+            let f = files.length === 1 ? files[0] : ffiltered[0];
+            if (get || f !== req.params.filename)
+                return res.redirect(
+                    "/" + mode + "/" + fileid + "/" + encodeURIComponent(f),
+                );
+            let filepath = path.join(foldername, f);
+            if (mode === "view") res.sendFile(filepath);
+            else res.download(filepath);
+        } else {
+            res.render("listing", { id: fileid, baseURL, files });
+        }
     };
 }
 

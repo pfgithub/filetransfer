@@ -3,6 +3,19 @@ html {
     height: 100%;
 }
 
+body {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 500px) 1fr;
+}
+.content {
+    grid-column: 2;
+    display: grid;
+    grid-template-rows: max-content max-content max-content;
+    grid-gap: 15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
 .uploading {
     display: none;
 }

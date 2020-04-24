@@ -8,7 +8,12 @@
 	</head>
 	<body>
 		<div class="content">
-			Uh oh! <%= msg %>! <a href="/">Home</a>
+			Files:
+			<ul>
+				<% for(let file of files) { %>
+					<li><a href="<%=baseURL%>/download/<%=id%>/<%=encodeURIComponent(file)%>">Download</a> <a href="<%=baseURL%>/view/<%=id%>/<%=encodeURIComponent(file)%>">View</a> <%=file%></li>
+				<% } %>
+			</ul>
 		</div>
 	</body>
 </html>
