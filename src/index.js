@@ -81,15 +81,13 @@ function randomName() {
                             ("g".codePointAt() - "0".codePointAt()),
                     ),
                 );
-            for (let i = 1; i < str.length - 3; i++) {
+            for (let i = 4; i < str.length - 3; i++) {
                 let strv = str.substring(0, i);
-                let strv3 = str.substring(0, i + 3);
                 try {
                     await fs.access(path.join(__dirname, "..", "data", strv));
-                    await fs.access(path.join(__dirname, "..", "data", strv3));
                     continue;
                 } catch (e) {}
-                resolve(strv3);
+                resolve(strv);
                 break;
             }
         });
