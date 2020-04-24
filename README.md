@@ -28,4 +28,10 @@ the server should start and give a url
 
 to select a different port, run with `env PORT=8080`
 
-if your computer has multiple ip addresses on the local network, start the server with `env IPADDR=[desired]` or `env IFACE=[desired]`. Running the server without either of these will show the possible ip addresses or network interfaces.
+if your computer has multiple ip addresses on the local network, start the server with `env IPADDR=[desired]` or `env IFACE=[desired]`. Running the server without either of these will show the possible ip addresses or network interfaces. to disable the baseurl thing entirely, or if other computers have a custom host entry, launch with `env RAWIP=localhost` (switch localhost for the host entry you want).
+
+## notes
+
+- don't run this on a forwarded port, keep it inside your local network.
+- qr codes are generated using a google api, so they won't work when you are not connected to the internet.
+- there is probably a filesize limit. the default has not been adjusted, so there may be issues with large files. this should be easy to fix.

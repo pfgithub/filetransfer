@@ -24,11 +24,13 @@ for (let [name, faces] of Object.entries(ifaces)) {
         indx++;
     }
 }
-resips = resips.filter(([name, addr]) => {
-    if (process.env.IPADDR) return addr === process.env.IPADDR;
-    if (process.env.IFACE) return name === process.env.IFACE;
-    return true;
-});
+resips = process.env.RAWIP
+    ? [["env", process.env.RAWIP]]
+    : resips.filter(([name, addr]) => {
+          if (process.env.IPADDR) return addr === process.env.IPADDR;
+          if (process.env.IFACE) return name === process.env.IFACE;
+          return true;
+      });
 if (resips.length > 1) {
     console.log(
         "Too many ip addresses. Launch with a listed env command to select correct address.",
@@ -41,6 +43,9 @@ if (resips.length > 1) {
         console.log("env IPADDR=" + addr + " (or) env IFACE=" + name);
     }
     process.exit(1);
+}
+if (resips.length < 1) {
+    console.log("No ip address. Launch with `env RAWIP=localhost`");
 }
 console.log("Launching on " + resips[0].join(" - "));
 console.log();
