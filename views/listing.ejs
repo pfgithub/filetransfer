@@ -15,28 +15,37 @@
 			</div>
 		</div>
 		<div class="content">
-			<% let link=baseURL + "/download/" + id; %>
-			<h1>Code: <code><%= id %></code>
-			</h1>
-			<p><a href="<%= link %>">
-				<%= link %>
-			</a></p>
-			<img class="qr" width="150" height="150"
-				src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=<%= encodeURIComponent(link) %>">
-			Files:
+			<% let link=baseURL + "/info/" + id; %>
+			<% if(!deleteconfirm) { %>
+				<h1>Code: <code><%= id %></code>
+				</h1>
+				<p><a href="<%= link %>">
+					<%= link %>
+				</a></p>
+				<img class="qr" width="150" height="150"
+					src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=<%= encodeURIComponent(link) %>">
+			<% } %>
+			<% if(deleteconfirm) { %>
+				<form action="/delete/<%=id%>" method="post" enctype="multipart/form-data"><button>Yes, Delete All</button></form>
+				<a href="/info/<%=id%>">Cancel</a>
+			<% } else { %>
+				<span>Files: <a href="/delete/<%=id%>">Delete All</a></span>
+			<% } %>
 			<ul>
-				<% for(const file of files) { %>
+				<% for(const file of files) { %> 
 					<li><a href="/download/<%=id%>/<%=encodeURIComponent(file)%>">Download</a> <a href="/view/<%=id%>/<%=encodeURIComponent(file)%>">View</a> <%=file%></li>
 				<% } %>
 			</ul>
-			<form id="uploadform" action="/upload" method="post" enctype="multipart/form-data">
-				<label>
-					Upload File(s):
-					<input id="upload" type="file" name="upload" multiple>
-				</label>
-				<input type="hidden" name="id" value="<%= id %>" />
-				<button id="jsdelete">Upload!</button>
-			</form>
+			<% if(!deleteconfirm) { %>
+				<form id="uploadform" action="/upload" method="post" enctype="multipart/form-data">
+					<label>
+						Upload more:
+						<input id="upload" type="file" name="upload" multiple>
+					</label>
+					<input type="hidden" name="id" value="<%= id %>" />
+					<button id="jsdelete">Upload!</button>
+				</form>
+			<% } %>
 		</div>
 		<div id="uploading" class="uploading fullscreen">
 			<div>

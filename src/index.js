@@ -74,7 +74,7 @@ app.post("/upload", async (req, res) => {
     if (!req || !req.files || !req.files.upload)
         return res.redirect("/error/upload-failed");
     let fileid;
-    if(req.body.id && typeof req.body.id === "string" && !/[^0-9a-z]/.exec(req.body.id)) {
+    if(req.body && req.body.id && typeof req.body.id === "string" && !/[^0-9a-z]/.exec(req.body.id)) {
         fileid = req.body.id;
     }else{
         fileid = await randomName();
@@ -86,17 +86,10 @@ app.post("/upload", async (req, res) => {
         ? req.files.upload
         : [req.files.upload];
     for (let file of filearr) {
-        console.log(file);
         let filename = path.join(foldername, safeFileName(file.name) );
         file.mv(path.join(basedir, filename));
     }
     return res.redirect("/info/" + fileid);
-});
-app.post("/uploadtext", async (req, ref) => {
-    if(!req || !req.body || !req.body.upload || typeof req.body.upload !== "string")
-        return res.redirect("/error/upload-text-failed");
-    console.log("=== Text ===\n"+req.body.upload+"\n=== ===");
-    res.end(req.body.upload);
 });
 
 // this is unnecessarily complicated
@@ -155,29 +148,49 @@ function downloadFile(mode, get) {
     };
 }
 
-function showFileList() {
+function showFileList(deleteconfirm) {
     return async(req, res, next) => {
-        const fileid = req.params.fileid.toLowerCase();
-        if (/[^0-9a-z]/.exec(fileid))
+        let fileid = req.params.fileid ?? "";
+        fileid = fileid.toLowerCase();
+        if (!fileid || /[^0-9a-z]/.exec(fileid))
             return res.render("error", { msg: "bad id" });
         const foldername = path.join(__dirname, "..", "data", fileid);
         let files;
         try {
             files = await fs.readdir(foldername);
         } catch (e) {
+            console.log(e);
             res.status(404);
             return res.render("error", {msg: "file not found"});
         }
-        return res.render("listing", {id: fileid, baseURL, files});
+        return res.render("listing", {id: fileid, baseURL, files, deleteconfirm: !!deleteconfirm});
     };
 }
 
 app.get("/info/:fileid", showFileList());
+app.get("/delete/:fileid", showFileList("deleteconfirm"));
+app.get("/info", (req, res, next) => {
+    if(!req.query.id) return res.redirect("/");
+    return res.redirect("/info/"+encodeURIComponent(req.query.id));
+});
+app.post("/delete/:fileid", async (req, res, next) => {
+    let fileid = req.params.fileid ?? "";
+    fileid = fileid.toLowerCase();
+    if (!fileid || /[^0-9a-z]/.exec(fileid))
+        return res.render("error", { msg: "bad id" });
+    const foldername = path.join(__dirname, "..", "data", fileid);
+    try {
+        await fs.rm(foldername, {recursive: true});
+    } catch(e) {
+        console.log(e);
+        res.status(404);
+        return res.render("error", {msg: "file not found"});
+    }
+    return res.redirect("/");
+})
 
 app.get("/view/:fileid/:filename?", downloadFile("view"));
-app.get("/view", downloadFile("view", "url"));
 app.get("/download/:fileid/:filename?", downloadFile("download"));
-app.get("/download", downloadFile("download", "url"));
 
 app.use((req, res, next) => {
     res.status(404);

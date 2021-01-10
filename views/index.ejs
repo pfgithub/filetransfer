@@ -15,34 +15,16 @@
 			</div>
 		</div>
 		<div class="content">
-			<% if(uploaded) { %>
-				<% let link = baseURL + "/download/" + uploaded; %>
-				Your file<%= s ? "s" : ""%> <%= s ? "have" : "has"%> been uploaded.
-				<h1>Code: <%= uploaded %></h1>
-				<p><a href="<%= link %>"><%= link %></a></p>
-				<img class="qr" width="150" height="150" src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=<%= encodeURIComponent(link) %>">
-			<% } %>
 			<form id="uploadform" action="/upload" method="post" enctype="multipart/form-data">
 				<label>
-					Upload more:
+					Upload File(s):
 					<input id="upload" type="file" name="upload" multiple>
 					<button id="jsdelete">Upload!</button>
 				</label>
 			</form>
-			<form action="/uploadtext" method="post" enctype="multipart/form-data">
-				<label>
-					Upload Text:
-                    <textarea id="upload" name="upload"></textarea>
-					<button>Post!</button>
-				</label>
-			</form>
-			<form action="/download" method="get" enctype="multipart/form-data">
+			<form action="/info" method="get" enctype="multipart/form-data">
 				<input placeholder="code" type="text" name="id">
 				<button>Download!</button>
-			</form>
-			<form action="/view" method="get" enctype="multipart/form-data">
-				<input placeholder="code" type="text" name="id">
-				<button>View!</button>
 			</form>
 		</div>
 		<div id="uploading" class="uploading fullscreen">
