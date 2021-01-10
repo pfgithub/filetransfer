@@ -133,7 +133,7 @@ function downloadFile(mode, get) {
             return res.render("error", { msg: "file not found" });
         }
         let ffiltered = files.filter(file => file === req.params.filename);
-        if (files.length === 1 || ffiltered.length === 1) {
+        if (ffiltered.length === 1) {
             let f = files.length === 1 ? files[0] : ffiltered[0];
             if (get || f !== req.params.filename)
                 return res.redirect(
@@ -143,7 +143,8 @@ function downloadFile(mode, get) {
             if (mode === "view") res.sendFile(filepath);
             else res.download(filepath);
         } else {
-            res.render("listing", { id: fileid, baseURL, files });
+            if(ffiltered.length === 0) return res.render("error", {msg: "file not found"});
+            return res.render("error", {msg: "multiple files matched?"});
         }
     };
 }
