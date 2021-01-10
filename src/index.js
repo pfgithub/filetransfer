@@ -9,7 +9,7 @@ const os = require("os");
 
 app.set("view engine", "ejs");
 
-app.use(fileUpload({ safeFileNames: true, preserveExtension: true }));
+app.use(fileUpload({ safeFileNames: false }));
 
 let port = +(process.env.PORT || "3000");
 let ifaces = os.networkInterfaces();
@@ -65,6 +65,10 @@ app.get("/", async (req, res) => {
 
 app.use("/public", express.static(path.join(__dirname, "client")));
 
+function safeFileName(f) {
+    return f.replace(/[^ -~\x80-\uFFFF]/g,"�").replace(/^([.\-])/,"_$1").split("/").join("\\");
+}
+
 // app.post("/") // for cli
 app.post("/upload", async (req, res) => {
     if (!req || !req.files || !req.files.upload)
@@ -77,12 +81,18 @@ app.post("/upload", async (req, res) => {
         ? req.files.upload
         : [req.files.upload];
     for (let file of filearr) {
-        let filename = path.join(foldername, file.name /*safe*/);
+        let filename = path.join(foldername, safeFileName(file.name) );
         file.mv(path.join(basedir, filename));
     }
     return res.redirect(
         "/?uploaded=" + fileid + (filearr.length === 1 ? "" : "&s=s"),
     );
+});
+app.post("/uploadtext", async (req, res) => {
+    if(!req || !req.body || !req.body.upload || typeof req.body.upload !== "string")
+        return res.redirect("/error/upload-text-failed");
+    console.log("=== Text ===\n"+req.body.upload+"\n=== ===");
+    res.end(req.body.upload);
 });
 
 // this is unnecessarily complicated

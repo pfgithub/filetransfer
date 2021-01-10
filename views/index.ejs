@@ -29,6 +29,13 @@
 					<button id="jsdelete">Upload!</button>
 				</label>
 			</form>
+			<form action="/uploadtext" method="post" enctype="multipart/form-data">
+				<label>
+					Upload Text:
+                    <textarea id="upload" name="upload"></textarea>
+					<button>Post!</button>
+				</label>
+			</form>
 			<form action="/download" method="get" enctype="multipart/form-data">
 				<input placeholder="code" type="text" name="id">
 				<button>Download!</button>
