@@ -73,7 +73,12 @@ function safeFileName(f) {
 app.post("/upload", async (req, res) => {
     if (!req || !req.files || !req.files.upload)
         return res.redirect("/error/upload-failed");
-    let fileid = await randomName();
+    let fileid;
+    if(req.body.id && typeof req.body.id === "string" && !/[^0-9a-z]/.exec(req.body.id)) {
+        fileid = req.body.id;
+    }else{
+        fileid = await randomName();
+    }
     let foldername = "/data/" + fileid;
     let basedir = path.join(__dirname, "..");
     await fs.mkdir(path.join(basedir, foldername), { recursive: true });
@@ -81,14 +86,13 @@ app.post("/upload", async (req, res) => {
         ? req.files.upload
         : [req.files.upload];
     for (let file of filearr) {
+        console.log(file);
         let filename = path.join(foldername, safeFileName(file.name) );
         file.mv(path.join(basedir, filename));
     }
-    return res.redirect(
-        "/?uploaded=" + fileid + (filearr.length === 1 ? "" : "&s=s"),
-    );
+    return res.redirect("/info/" + fileid);
 });
-app.post("/uploadtext", async (req, res) => {
+app.post("/uploadtext", async (req, ref) => {
     if(!req || !req.body || !req.body.upload || typeof req.body.upload !== "string")
         return res.redirect("/error/upload-text-failed");
     console.log("=== Text ===\n"+req.body.upload+"\n=== ===");
@@ -107,7 +111,7 @@ function randomName() {
                             ("g".codePointAt() - "0".codePointAt()),
                     ),
                 );
-            for (let i = 3; i < str.length; i++) {
+            for (let i = 4; i < str.length; i++) {
                 let strv = str.substring(0, i);
                 try {
                     await fs.access(path.join(__dirname, "..", "data", strv));
@@ -150,6 +154,25 @@ function downloadFile(mode, get) {
         }
     };
 }
+
+function showFileList() {
+    return async(req, res, next) => {
+        const fileid = req.params.fileid.toLowerCase();
+        if (/[^0-9a-z]/.exec(fileid))
+            return res.render("error", { msg: "bad id" });
+        const foldername = path.join(__dirname, "..", "data", fileid);
+        let files;
+        try {
+            files = await fs.readdir(foldername);
+        } catch (e) {
+            res.status(404);
+            return res.render("error", {msg: "file not found"});
+        }
+        return res.render("listing", {id: fileid, baseURL, files});
+    };
+}
+
+app.get("/info/:fileid", showFileList());
 
 app.get("/view/:fileid/:filename?", downloadFile("view"));
 app.get("/view", downloadFile("view", "url"));
