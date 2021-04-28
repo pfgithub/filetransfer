@@ -69,6 +69,10 @@ function safeFileName(f) {
     return f.replace(/[^ -~\x80-\uFFFF]/g,"�").replace(/^([.\-])/,"_$1").split("/").join("\\");
 }
 
+app.post("/upload/text", async (req, res) => {
+    console.log(req.body.text);
+});
+
 // app.post("/") // for cli
 app.post("/upload", async (req, res) => {
     if (!req || !req.files || !req.files.upload)
@@ -164,7 +168,8 @@ function showFileList(deleteconfirm) {
             res.status(404);
             return res.render("error", {msg: "file not found"});
         }
-        return res.render("listing", {id: fileid, baseURL, files, deleteconfirm: !!deleteconfirm});
+        const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+        return res.render("listing", {id: fileid, baseURL, files: files.sort(collator.compare), deleteconfirm: !!deleteconfirm});
     };
 }
 
